@@ -1,5 +1,4 @@
-
-import React, { createContext, useState } from 'react';
+import React, {useState, createContext} from 'react'
 import {
   BrowserRouter as Router,
   Switch,
@@ -7,60 +6,55 @@ import {
   Redirect,
   Link
 } from "react-router-dom";
-import { Button, Drawer } from 'antd';
+import './App.css'
+import { useAuthState } from 'react-firebase-hooks/auth'
+import { UserContext } from './utils/context'
+import { CurrentDay } from './components/currentDay'
+import { TodoDashboard } from './components/todoDashboard'
+import { Header } from './components/Header'
+import { START, TODO, TODO_TEST, TODO_DASHBOARD, EDIT } from './constants/routes'
+import { Authorithation } from './components/Authorithation'
+import { TodoApp } from './components/TodoApp'
+import { fireAuth } from './firebase'
 import './App.css';
-import {CurrentDay} from './components/currentDay'
-import {EditPage} from './components/edit'
-import {TodoDashboard} from './components/todoDashboard'
-
-import { START, TODO, TODO_DASHBOARD, EDIT } from './constants/routes'
-import { Authorithation } from './components/Authorithation';
+import {EditPage} from './components/edit';
 
 export const MyContext = createContext({})
 
 function App() {
-  const [user, setUser] = useState({})
-  const [isOpenMenu, setIsOpenMenu] = useState(false)
-
-  const showDrawer = () => {
-    setIsOpenMenu(true);
-  };
-  const onCloseDrawer = () => {
-    setIsOpenMenu(false);
-  };
-  
+  const [user, isLoading] = useAuthState(fireAuth)
 
   return (
-
-    <MyContext.Provider value={user}>
-      <Router>
-        <div className='app'>
-         <div>
-           {/* //@todo add gamburger menu icon instead of Menu word */}
-           <Button onClick={showDrawer} >
-             Menu
-           </Button>
-            {/* //@todo move to separate component*/}
-           <Drawer
-           closable={false}
-        placement="right"
-        onClose={onCloseDrawer}
-        visible={isOpenMenu}
-      >
-        <Link to={TODO} onClick={onCloseDrawer}>Current day page</Link>
- <Link to={EDIT} onClick={onCloseDrawer}>Edit page</Link>
-      </Drawer>
-         </div>
-          <Switch>
-            <Route path={START} render={({ history }) => <Authorithation history={history} setUser={setUser} />} />
-            <Route path={TODO} render={() => <CurrentDay />} />
-            <Route path={TODO_DASHBOARD} component={TodoDashboard} />
-            <Route path={EDIT} component={EditPage} />
-            <Redirect to={START} />
-          </Switch>
-        </div>
-      </Router>
-    </MyContext.Provider>
-  );
+    <UserContext.Provider value={user}>
+      {isLoading ? (
+        <div>loader</div>
+      ) : user ? (
+        <Router>
+          <div className="app">
+          <Header />
+            <Switch>
+              <Route path={TODO_TEST} render={() => <TodoApp />} />
+              <Route path={TODO} render={() => <CurrentDay />} />
+              <Route path={TODO_DASHBOARD} component={TodoDashboard} />
+              <Route path={EDIT} component={EditPage} />
+              <Redirect to={TODO_TEST} />
+            </Switch>
+          </div>
+        </Router>
+      ) : (
+        <Router>
+          <div className="app">
+            <Switch>
+              <Route
+                path={START}
+                render={({ history }) => <Authorithation history={history} />}
+              />
+              <Redirect to={START} />
+            </Switch>
+          </div>
+        </Router>
+      )}
+    </UserContext.Provider>
+  )
 }
-export default App;
+export default App
