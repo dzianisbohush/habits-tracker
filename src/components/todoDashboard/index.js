@@ -1,3 +1,1 @@
-export const TodoDashboard = () => {
-    return 'TodoDashboard'
-}
+export const TodoDashboard = () => 'TodoDashboard';
