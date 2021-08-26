@@ -7,12 +7,11 @@ import {
   Redirect
 } from "react-router-dom";
 import './App.css';
-import { Button } from 'antd';
 import {CurrentDay} from './components/currentDay'
+import {TodoDashboard} from './components/todoDashboard'
 
-import { START, TODO } from './constants/routes'
+import { START, TODO, TODO_DASHBOARD } from './constants/routes'
 import { Authorithation } from './components/Authorithation';
-import { TodoApp } from './components/TodoApp'
 
 export const MyContext = createContext({})
 
@@ -27,6 +26,7 @@ function App() {
           <Switch>
             <Route path={START} render={({ history }) => <Authorithation history={history} setUser={setUser} />} />
             <Route path={TODO} render={() => <CurrentDay />} />
+            <Route path={TODO_DASHBOARD} component={TodoDashboard} />
             <Redirect to={START} />
           </Switch>
         </div>
