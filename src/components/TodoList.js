@@ -9,12 +9,10 @@ const TodoList = () => {
         const todoRef = firebase.database().ref('Todo');
         todoRef.on('value', (snapshot) => {
             const todos = snapshot.val();
-            console.log('todos', todos);
             const todoList = []
             for (let id in todos) {
                 todoList.push({ id, ...todos[id] });
             }
-            console.log('todoList', todoList);
             setTodoList(todoList);
         })
     }, [])

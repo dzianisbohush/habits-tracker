@@ -10,7 +10,7 @@ const Form = () => {
     }
     const createTodo = () => {
         const todoRef = firebase.database().ref('Todo');
-        console.log(11, todoRef);
+    
         const todo = {
             title,
             complete: false,
