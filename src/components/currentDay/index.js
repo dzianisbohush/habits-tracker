@@ -10,12 +10,13 @@ export const CurrentDay = () => {
   //@todo add getting init value from firebase db
   const { uid } = useContext(UserContext)
   const [habits, setHabits] = useState([])
+  const [initialErlyHabits, setInitialEarlyHabits] = useState([])
 
-  useEffect(() => {
-    const todayHabitsRef = firebase
+  const todayHabitsRef = firebase
       .database()
       .ref(`${uid}/habbits/${moment().format(KEY_DATE_FORMAT)}`)
 
+  useEffect(() => {
     const allHabitsRef = firebase.database().ref(`${uid}/habbits`)
 
     todayHabitsRef.on('value', (snapshot) => {
@@ -26,7 +27,6 @@ export const CurrentDay = () => {
         for (let id in todayHabits) {
           habitsList.push({ id, ...todayHabits[id] })
         }
-
         setHabits(habitsList)
       } else {
         allHabitsRef.on('value', (snapshot) => {
@@ -45,24 +45,27 @@ export const CurrentDay = () => {
               habitsList.push({ id, ...yesterdayHabits[id] })
             }
             setHabits(habitsList)
+            setInitialEarlyHabits(habitsList)
           })
-        })
-
-        habitsList.forEach(habit => {
-          const habitKeys = Object.keys(habit).filter(key => key !== 'id')
-          const habitToSend = {}
-          habitKeys.forEach(key => {
-            if (key === 'completedSteps') {
-              habitToSend[key] = 0
-            } else {
-              habitToSend[key] = habit[key]
-            }
-          })
-          todayHabitsRef.push(habitToSend)
         })
       }
     })
   }, [])
+
+  useEffect(() => {
+    initialErlyHabits.forEach((habit) => {
+      const habitKeys = Object.keys(habit).filter((key) => key !== 'id')
+      const habitToSend = {}
+      habitKeys.forEach((key) => {
+        if (key === 'completedSteps') {
+          habitToSend[key] = 0
+        } else {
+          habitToSend[key] = habit[key]
+        }
+      })
+      todayHabitsRef.push(habitToSend)
+    })
+  }, [initialErlyHabits])
 
   const currentDayProgress = useMemo(() => {
     let allTotalStepsCount = 0
@@ -77,7 +80,7 @@ export const CurrentDay = () => {
   }, [habits])
 
   // @todo change to id instead of title
-  const declineStep = (id, title) => () => {
+  const declineStep = (title) => () => {
     setHabits(
       habits.map((habit) => {
         if (habit.title === title) {
@@ -99,7 +102,7 @@ export const CurrentDay = () => {
   }
 
   // @todo change to id instead of title
-  const increaseStep = (id, title) => () => {
+  const increaseStep = (title) => () => {
     setHabits(
       habits.map((habit) => {
         if (habit.title === title) {
