@@ -93,6 +93,7 @@ export const CurrentDay = () => {
     })
   }
 
+  //@todo try union the func with increaseStep
   // @todo change to id instead of title
   const declineStep = (id, title) => () => {
     let value
@@ -107,15 +108,6 @@ export const CurrentDay = () => {
       }),
       changeHabitStep(id, value),
     )
-
-    //@todo try union the func with increaseStep
-    //@todo add changes to db
-    // date format moment().toISOString()
-    // example
-    // const todoRef = firebase.database().ref('Todo').child(todo.id);
-    //         todoRef.update({
-    //             complete: !todo.complete,
-    //         })
   }
 
   // @todo change to id instead of title
@@ -132,19 +124,11 @@ export const CurrentDay = () => {
       }),
       changeHabitStep(id, value),
     )
-
-    //@todo add changes to db
-    // example
-    // const todoRef = firebase.database().ref('Todo').child(todo.id);
-    //         todoRef.update({
-    //             complete: !todo.complete,
-    //         })
   }
 
   return (
     <div>
       {/* @todo move header to separate component */}
-      {/* @todo add real date */}
       <div>
         {moment().format('LL')}
         <Progress
