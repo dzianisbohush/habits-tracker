@@ -17,7 +17,7 @@ const Todo = ({ todo }) => {
     });
   };
   return (
-    <>
+  <>
       <div className="todo">
         <li className="list">
           {todo.complete ? (

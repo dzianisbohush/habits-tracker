@@ -24,7 +24,7 @@ export const EditPage = () => {
     console.log('Failed:', errorInfo);
   };
 
-  return (
+  return (   
     <div>
       {/* @todo add adding form to sepatatre componnet */}
       <div>
