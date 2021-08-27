@@ -7,8 +7,8 @@ const {
   REACT_APP_STORAGE_BUCKET,
   REACT_APP_SENDER_ID,
   REACT_APP_APP_ID,
-  REACT_APP_DATABASE_URL
-} = process.env
+  REACT_APP_DATABASE_URL,
+} = process.env;
 
 const firebaseConfig = {
   apiKey: REACT_APP_API_KEY,
