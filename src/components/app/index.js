@@ -6,9 +6,10 @@ import {
   Redirect,
 } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { UserContext } from '../../utils/context';
-import { CurrentDay } from '../currentDay';
-import { Dashboard } from '../dashboard';
+import { Spin } from 'antd';
+import { UserContext } from './utils/context';
+import { CurrentDay } from './components/currentDay';
+import { Dashboard } from './components/dashboard';
 import {
   START,
   DASHBOARD,
@@ -24,7 +25,11 @@ export const App = () => {
   const [user, isLoading] = useAuthState(fireAuth);
 
   if (isLoading) {
-    return <div>loader</div>;
+    return (
+      <div className="app">
+        <Spin size="large" />
+      </div>
+    );
   }
 
   return (

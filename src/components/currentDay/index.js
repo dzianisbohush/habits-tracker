@@ -13,16 +13,18 @@ import { UserContext } from '../../utils/context';
 import { KEY_DATE_FORMAT } from '../../constants/date';
 
 export const CurrentDay = () => {
-  // @todo add getting init value from firebase db
   const { uid } = useContext(UserContext);
   const [habits, setHabits] = useState([]);
-  const [initialErlyHabits, setInitialEarlyHabits] = useState([]);
+  const [shouldSendHabitsToDB, setShouldSendHabitsToDB] =
+    useState(false);
 
+  // @todo add todayHabitsRef to constants (we will use this for edit page at least)
   const todayHabitsRef = firebase
     .database()
     .ref(`${uid}/habbits/${moment().format(KEY_DATE_FORMAT)}`);
 
   useEffect(() => {
+    // @todo add allHabitsRef to constants (we will use this for dashboard page at least)
     const allHabitsRef = firebase.database().ref(`${uid}/habbits`);
 
     todayHabitsRef.on('value', (snapshot) => {
@@ -42,18 +44,18 @@ export const CurrentDay = () => {
             const dates = Object.keys(allHabits);
             const lastDate = dates[dates.length - 1];
 
-            const yesterdayHabitsRef = firebase
+            const lastDayHabitsRef = firebase
               .database()
               .ref(`${uid}/habbits/${lastDate}`);
 
-            yesterdayHabitsRef.on('value', (snapshot) => {
+            lastDayHabitsRef.on('value', (snapshot) => {
               const yesterdayHabits = snapshot.val();
 
               for (const id in yesterdayHabits) {
                 habitsList.push({ id, ...yesterdayHabits[id] });
               }
               setHabits(habitsList);
-              setInitialEarlyHabits(habitsList);
+              setShouldSendHabitsToDB(true);
             });
           }
         });
@@ -62,21 +64,25 @@ export const CurrentDay = () => {
   }, []);
 
   useEffect(() => {
-    initialErlyHabits.forEach((habit) => {
-      const habitKeys = Object.keys(habit).filter(
-        (key) => key !== 'id',
-      );
-      const habitToSend = {};
-      habitKeys.forEach((key) => {
-        if (key === 'completedSteps') {
-          habitToSend[key] = 0;
-        } else {
-          habitToSend[key] = habit[key];
-        }
+    if (shouldSendHabitsToDB) {
+      habits.forEach((habit) => {
+        const habitKeys = Object.keys(habit).filter(
+          (key) => key !== 'id',
+        );
+        const habitToSend = {};
+        habitKeys.forEach((key) => {
+          if (key === 'completedSteps') {
+            habitToSend[key] = 0;
+          } else {
+            habitToSend[key] = habit[key];
+          }
+        });
+        todayHabitsRef.push(habitToSend);
       });
-      todayHabitsRef.push(habitToSend);
-    });
-  }, [initialErlyHabits]);
+
+      setShouldSendHabitsToDB(false);
+    }
+  }, [shouldSendHabitsToDB]);
 
   const currentDayProgress = useMemo(() => {
     let allTotalStepsCount = 0;
@@ -96,6 +102,7 @@ export const CurrentDay = () => {
     });
   };
 
+  // @todo try union the func with increaseStep
   // @todo change to id instead of title
   const declineStep = (id, title) => () => {
     let value;
@@ -110,15 +117,6 @@ export const CurrentDay = () => {
       }),
       changeHabitStep(id, value),
     );
-
-    // @todo try union the func with increaseStep
-    // @todo add changes to db
-    // date format moment().toISOString()
-    // example
-    // const todoRef = firebase.database().ref('Todo').child(todo.id);
-    //         todoRef.update({
-    //             complete: !todo.complete,
-    //         })
   };
 
   // @todo change to id instead of title
@@ -135,19 +133,11 @@ export const CurrentDay = () => {
       }),
       changeHabitStep(id, value),
     );
-
-    // @todo add changes to db
-    // example
-    // const todoRef = firebase.database().ref('Todo').child(todo.id);
-    //         todoRef.update({
-    //             complete: !todo.complete,
-    //         })
   };
 
   return (
     <div>
       {/* @todo move header to separate component */}
-      {/* @todo add real date */}
       <div>
         <p className={styles.date}>{moment().format('LL')}</p>
         <Progress
