@@ -21,6 +21,7 @@ export const EditPage = () => {
     .database()
     .ref(`${uid}/habbits`)
 
+    //@todo if it is not needed - remove this plz
   const test = () => {
     todoRefff.on('value', (snapshot) => {
       const todos = snapshot.val()

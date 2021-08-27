@@ -7,16 +7,17 @@ import { UserContext } from '../../utils/context'
 import { KEY_DATE_FORMAT } from '../../constants/date'
 
 export const CurrentDay = () => {
-  //@todo add getting init value from firebase db
   const { uid } = useContext(UserContext)
   const [habits, setHabits] = useState([])
-  const [initialErlyHabits, setInitialEarlyHabits] = useState([])
+  const [shouldSendHabitsToDB, setShouldSendHabitsToDB] = useState(false)
 
+  //@todo add todayHabitsRef to constants (we will use this for edit page at least)
   const todayHabitsRef = firebase
     .database()
     .ref(`${uid}/habbits/${moment().format(KEY_DATE_FORMAT)}`)
 
   useEffect(() => {
+      //@todo add allHabitsRef to constants (we will use this for dashboard page at least)
     const allHabitsRef = firebase.database().ref(`${uid}/habbits`)
 
     todayHabitsRef.on('value', (snapshot) => {
@@ -36,18 +37,18 @@ export const CurrentDay = () => {
             const dates = Object.keys(allHabits)
             const lastDate = dates[dates.length - 1]
 
-            const yesterdayHabitsRef = firebase
+            const lastDayHabitsRef = firebase
               .database()
               .ref(`${uid}/habbits/${lastDate}`)
 
-            yesterdayHabitsRef.on('value', (snapshot) => {
+              lastDayHabitsRef.on('value', (snapshot) => {
               const yesterdayHabits = snapshot.val()
 
               for (let id in yesterdayHabits) {
                 habitsList.push({ id, ...yesterdayHabits[id] })
               }
               setHabits(habitsList)
-              setInitialEarlyHabits(habitsList)
+              setShouldSendHabitsToDB(true)
             })
           }
         })
@@ -56,19 +57,23 @@ export const CurrentDay = () => {
   }, [])
 
   useEffect(() => {
-    initialErlyHabits.forEach((habit) => {
-      const habitKeys = Object.keys(habit).filter((key) => key !== 'id')
-      const habitToSend = {}
-      habitKeys.forEach((key) => {
-        if (key === 'completedSteps') {
-          habitToSend[key] = 0
-        } else {
-          habitToSend[key] = habit[key]
-        }
+    if(shouldSendHabitsToDB) {
+      habits.forEach((habit) => {
+        const habitKeys = Object.keys(habit).filter((key) => key !== 'id')
+        const habitToSend = {}
+        habitKeys.forEach((key) => {
+          if (key === 'completedSteps') {
+            habitToSend[key] = 0
+          } else {
+            habitToSend[key] = habit[key]
+          }
+        })
+        todayHabitsRef.push(habitToSend)
       })
-      todayHabitsRef.push(habitToSend)
-    })
-  }, [initialErlyHabits])
+
+      setShouldSendHabitsToDB(false)
+    }
+  }, [shouldSendHabitsToDB])
 
   const currentDayProgress = useMemo(() => {
     let allTotalStepsCount = 0

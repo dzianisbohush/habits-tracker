@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import './App.css';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { Spin } from 'antd';
 import { UserContext } from './utils/context';
 import { CurrentDay } from './components/currentDay';
 import { Dashboard } from './components/dashboard';
@@ -27,7 +28,11 @@ function App() {
   const [user, isLoading] = useAuthState(fireAuth);
 
   if (isLoading) {
-    return <div>loader</div>;
+    return (
+      <div className="app">
+        <Spin size="large" />
+      </div>
+    )
   }
 
   return (
