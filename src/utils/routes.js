@@ -1,14 +1,12 @@
 import { Authorithation } from '../components/Authorithation';
 import { CurrentDay } from '../components/currentDay';
-import { TodoApp } from '../components/TodoApp';
-import { TodoDashboard } from '../components/todoDashboard';
+import { Dashboard } from '../components/dashboard';
 import { EditPage } from '../components/edit';
 import {
   START,
-  TODO,
-  TODO_TEST,
-  TODO_DASHBOARD,
+  DASHBOARD,
   EDIT,
+  CURRENT_DAY
 } from './constants/routes';
 
 export const publicRoutes = [
@@ -20,16 +18,12 @@ export const publicRoutes = [
 
 export const privateRoutes = [
   {
-    path: TODO,
+    path: CURRENT_DAY,
     component: CurrentDay,
   },
   {
-    path: TODO_TEST,
-    component: TodoApp,
-  },
-  {
-    path: TODO_DASHBOARD,
-    component: TodoDashboard,
+    path: DASHBOARD,
+    component: Dashboard,
   },
   {
     path: EDIT,

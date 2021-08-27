@@ -1,6 +1,6 @@
 import React from 'react';
 import { fireAuth, fireGoogleProvider } from '../firebase';
-import { TODO_TEST } from '../constants/routes';
+import { CURRENT_DAY } from '../constants/routes';
 
 export const Authorithation = ({ history }) => {
   const signIn = (event) => {
@@ -8,10 +8,10 @@ export const Authorithation = ({ history }) => {
     fireAuth
       .signInWithPopup(fireGoogleProvider)
       .then(() => {
-        history.push(TODO_TEST);
+        history.push(CURRENT_DAY);
       })
-      .catch(({ message }) => {
-        console.log('blya', message);
+      .catch((err) => {
+        throw new Error(err);
       });
   };
   return (
