@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { Spin } from 'antd';
+import styles from './style.module.css';
 import { UserContext } from '../../utils/context';
 import { CurrentDay } from '../currentDay';
 import { Dashboard } from '../dashboard';
@@ -26,7 +27,7 @@ export const App = () => {
 
   if (isLoading) {
     return (
-      <div className="app">
+      <div className={styles.loaderWrapper}>
         <Spin size="large" />
       </div>
     );
@@ -36,7 +37,7 @@ export const App = () => {
     <UserContext.Provider value={user}>
       {user ? (
         <Router>
-          <div className="app">
+          <div className={styles.app}>
             <Switch>
               <Route path={CURRENT_DAY} component={CurrentDay} />
               <Route path={DASHBOARD} component={Dashboard} />
@@ -48,7 +49,7 @@ export const App = () => {
         </Router>
       ) : (
         <Router>
-          <div className="app">
+          <div className={styles.app}>
             <Switch>
               <Route
                 path={START}
