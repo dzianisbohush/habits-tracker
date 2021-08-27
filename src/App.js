@@ -4,25 +4,21 @@ import {
   Switch,
   Route,
   Redirect,
-  Link,
 } from 'react-router-dom';
 import './App.css';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { UserContext } from './utils/context';
 import { CurrentDay } from './components/currentDay';
-import { TodoDashboard } from './components/todoDashboard';
+import { Dashboard } from './components/dashboard';
 import { Header } from './components/Header';
 import {
   START,
-  TODO,
-  TODO_TEST,
-  TODO_DASHBOARD,
+  DASHBOARD,
   EDIT,
+  CURRENT_DAY
 } from './constants/routes';
 import { Authorithation } from './components/Authorithation';
-import { TodoApp } from './components/TodoApp';
 import { fireAuth } from './firebase';
-
 import { EditPage } from './components/edit';
 
 export const MyContext = createContext({});
@@ -41,14 +37,10 @@ function App() {
           <div className="app">
             <Header />
             <Switch>
-              <Route path={TODO_TEST} render={() => <TodoApp />} />
-              <Route path={TODO} render={() => <CurrentDay />} />
-              <Route
-                path={TODO_DASHBOARD}
-                component={TodoDashboard}
-              />
+              <Route path={CURRENT_DAY} component={CurrentDay} />
+              <Route path={DASHBOARD} component={Dashboard} />
               <Route path={EDIT} component={EditPage} />
-              <Redirect to={TODO_TEST} />
+              <Redirect to={CURRENT_DAY} />
             </Switch>
           </div>
         </Router>

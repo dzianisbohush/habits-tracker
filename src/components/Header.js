@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { Button, Drawer } from 'antd';
 import { fireAuth } from '../firebase';
 import { UserContext } from '../utils/context';
-import { TODO, EDIT } from '../constants/routes';
+import { CURRENT_DAY, EDIT } from '../constants/routes';
 
 export const Header = () => {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
@@ -38,7 +38,7 @@ export const Header = () => {
         onClose={onCloseDrawer}
         visible={isOpenMenu}
       >
-        <Link to={TODO} onClick={onCloseDrawer}>
+        <Link to={CURRENT_DAY} onClick={onCloseDrawer}>
           Current day page
         </Link>
         <Link to={EDIT} onClick={onCloseDrawer}>

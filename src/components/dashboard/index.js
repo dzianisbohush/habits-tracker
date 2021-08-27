@@ -4,7 +4,7 @@ import {randomValues, shiftDate, today, classNames} from "./dataUtils";
 import './hitmap.css'
 import ReactTooltip from 'react-tooltip';
 
-export const TodoDashboard = () => {
+export const Dashboard = () => {
     const getValueClass = value => classNames({
         'cell': true,
         [`color-github-${value.count}`]: value,
