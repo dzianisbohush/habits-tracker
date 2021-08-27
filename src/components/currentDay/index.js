@@ -31,22 +31,25 @@ export const CurrentDay = () => {
       } else {
         allHabitsRef.on('value', (snapshot) => {
           const allHabits = snapshot.val()
-          const dates = Object.keys(allHabits)
-          const lastDate = dates[dates.length - 1]
 
-          const yesterdayHabitsRef = firebase
-            .database()
-            .ref(`${uid}/habbits/${lastDate}`)
+          if (allHabits) {
+            const dates = Object.keys(allHabits)
+            const lastDate = dates[dates.length - 1]
 
-          yesterdayHabitsRef.on('value', (snapshot) => {
-            const yesterdayHabits = snapshot.val()
+            const yesterdayHabitsRef = firebase
+              .database()
+              .ref(`${uid}/habbits/${lastDate}`)
 
-            for (let id in yesterdayHabits) {
-              habitsList.push({ id, ...yesterdayHabits[id] })
-            }
-            setHabits(habitsList)
-            setInitialEarlyHabits(habitsList)
-          })
+            yesterdayHabitsRef.on('value', (snapshot) => {
+              const yesterdayHabits = snapshot.val()
+
+              for (let id in yesterdayHabits) {
+                habitsList.push({ id, ...yesterdayHabits[id] })
+              }
+              setHabits(habitsList)
+              setInitialEarlyHabits(habitsList)
+            })
+          }
         })
       }
     })
