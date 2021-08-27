@@ -1,108 +1,129 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Progress, Button } from 'antd';
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
-import moment from 'moment';
+import React, { useState, useEffect, useMemo, useContext } from 'react'
+import { Progress, Button } from 'antd'
+import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
+import moment from 'moment'
+import firebase from '../../firebase'
+import { UserContext } from '../../utils/context'
+import { KEY_DATE_FORMAT } from '../../constants/date'
 
 export const CurrentDay = () => {
-  // @todo add getting init value from firebase db
-  const [habits, setHabits] = useState([
-    {
-      title: 'habit 1',
-      completedSteps: 0,
-      totalSteps: 1,
-    },
-    {
-      title: 'habit 2',
-      completedSteps: 1,
-      totalSteps: 1,
-    },
-    {
-      title: 'habit 3',
-      completedSteps: 2,
-      totalSteps: 3,
-    },
-    {
-      title: 'habit 4',
-      completedSteps: 0,
-      totalSteps: 2,
-    },
-    {
-      title: 'habit 5',
-      completedSteps: 2,
-      totalSteps: 4,
-    },
-  ]);
+  //@todo add getting init value from firebase db
+  const { uid } = useContext(UserContext)
+  const [habits, setHabits] = useState([])
 
   useEffect(() => {
-    // @todo add getting init habits from db
-  }, []);
+    const todayHabitsRef = firebase
+      .database()
+      .ref(`${uid}/habbits/${moment().format(KEY_DATE_FORMAT)}`)
+
+    const allHabitsRef = firebase.database().ref(`${uid}/habbits`)
+
+    todayHabitsRef.on('value', (snapshot) => {
+      const todayHabits = snapshot.val()
+      const habitsList = []
+
+      if (todayHabits) {
+        for (let id in todayHabits) {
+          habitsList.push({ id, ...todayHabits[id] })
+        }
+
+        setHabits(habitsList)
+      } else {
+        allHabitsRef.on('value', (snapshot) => {
+          const allHabits = snapshot.val()
+          const dates = Object.keys(allHabits)
+          const lastDate = dates[dates.length - 1]
+
+          const yesterdayHabitsRef = firebase
+            .database()
+            .ref(`${uid}/habbits/${lastDate}`)
+
+          yesterdayHabitsRef.on('value', (snapshot) => {
+            const yesterdayHabits = snapshot.val()
+
+            for (let id in yesterdayHabits) {
+              habitsList.push({ id, ...yesterdayHabits[id] })
+            }
+            setHabits(habitsList)
+          })
+        })
+
+        habitsList.forEach(habit => {
+          const habitKeys = Object.keys(habit).filter(key => key !== 'id')
+          const habitToSend = {}
+          habitKeys.forEach(key => {
+            if (key === 'completedSteps') {
+              habitToSend[key] = 0
+            } else {
+              habitToSend[key] = habit[key]
+            }
+          })
+          todayHabitsRef.push(habitToSend)
+        })
+      }
+    })
+  }, [])
 
   const currentDayProgress = useMemo(() => {
-    let allTotalStepsCount = 0;
-    let allCompletedStepsCount = 0;
+    let allTotalStepsCount = 0
+    let allCompletedStepsCount = 0
 
     habits.forEach(({ totalSteps, completedSteps }) => {
-      allTotalStepsCount += totalSteps;
-      allCompletedStepsCount += completedSteps;
-    });
+      allTotalStepsCount += totalSteps
+      allCompletedStepsCount += completedSteps
+    })
 
-    return (100 / allTotalStepsCount) * allCompletedStepsCount;
-  }, [habits]);
+    return (100 / allTotalStepsCount) * allCompletedStepsCount
+  }, [habits])
 
   // @todo change to id instead of title
-  const declineStep = (title) => () => {
+  const declineStep = (id, title) => () => {
     setHabits(
       habits.map((habit) => {
         if (habit.title === title) {
-          return {
-            ...habit,
-            completedSteps: habit.completedSteps - 1,
-          };
+          return { ...habit, completedSteps: --habit.completedSteps }
         }
 
-        return habit;
+        return habit
       }),
-    );
+    )
 
-    // @todo try union the func with increaseStep
-    // @todo add changes to db
+    //@todo try union the func with increaseStep
+    //@todo add changes to db
     // date format moment().toISOString()
     // example
     // const todoRef = firebase.database().ref('Todo').child(todo.id);
     //         todoRef.update({
     //             complete: !todo.complete,
     //         })
-  };
+  }
 
   // @todo change to id instead of title
-  const increaseStep = (title) => () => {
+  const increaseStep = (id, title) => () => {
     setHabits(
       habits.map((habit) => {
         if (habit.title === title) {
-          return {
-            ...habit,
-            completedSteps: habit.completedSteps + 1,
-          };
+          return { ...habit, completedSteps: ++habit.completedSteps }
         }
 
-        return habit;
+        return habit
       }),
-    );
+    )
 
-    // @todo add changes to db
+    //@todo add changes to db
     // example
     // const todoRef = firebase.database().ref('Todo').child(todo.id);
     //         todoRef.update({
     //             complete: !todo.complete,
     //         })
-  };
+  }
 
   return (
     <div>
       {/* @todo move header to separate component */}
       {/* @todo add real date */}
       <div>
-        {moment('2021-08-26T08:54:05.130Z').format('LL')}
+        {moment().format('LL')}
         <Progress
           type="circle"
           percent={currentDayProgress}
@@ -143,5 +164,5 @@ export const CurrentDay = () => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}

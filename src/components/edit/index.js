@@ -1,30 +1,42 @@
-import React from 'react';
-import { Form, Input, Button, InputNumber } from 'antd';
+import React, { useContext, useState } from 'react'
+import firebase from '../../firebase'
+import moment from 'moment'
+import { Form, Input, Button, InputNumber } from 'antd'
+import { UserContext } from '../../utils/context'
+import { KEY_DATE_FORMAT } from '../../constants/date'
 
 export const EditPage = () => {
-  const onFinish = (values) => {
-    console.log('Success:', values);
+  const { uid } = useContext(UserContext)
+  const [habbits, setHabbits] = useState({})
 
-    // @todo add to db here
-    //    format for date     moment().toISOString()
-    // it should be something like:
-    // 'user_id' : {
-    //     "some date": {
-    //         details: [
-    //             {
-    //                 ...values,
-    //                 completedSteps: 0,
-    //             }
-    //         ]
-    //     }
-    // }
-  };
+  const todayHabbitsRef = firebase
+    .database()
+    .ref(`${uid}/habbits/${moment().format(KEY_DATE_FORMAT)}`)
+
+  const onFinish = (values) => {
+    todayHabbitsRef.push({ ...values, completedSteps: 0 })
+  }
+
+  const todoRefff = firebase
+    .database()
+    .ref(`${uid}/habbits`)
+
+  const test = () => {
+    todoRefff.on('value', (snapshot) => {
+      const todos = snapshot.val()
+      const todoList = []
+      for (let id in todos) {
+        todoList.push({ id, ...todos[id] })
+      }
+      setHabbits(todoList)
+    })
+  }
 
   const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
+    console.log('Failed:', errorInfo)
+  }
 
-  return (   
+  return (
     <div>
       {/* @todo add adding form to sepatatre componnet */}
       <div>
