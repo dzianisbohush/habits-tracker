@@ -10,7 +10,6 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { UserContext } from './utils/context';
 import { CurrentDay } from './components/currentDay';
 import { Dashboard } from './components/dashboard';
-import { Header } from './components/Header';
 import {
   START,
   DASHBOARD,
@@ -20,6 +19,7 @@ import {
 import { Authorithation } from './components/Authorithation';
 import { fireAuth } from './firebase';
 import { EditPage } from './components/edit';
+import { BottomMenu } from './components/Menu';
 
 export const MyContext = createContext({});
 
@@ -35,13 +35,13 @@ function App() {
       {user ? (
         <Router>
           <div className="app">
-            <Header />
             <Switch>
               <Route path={CURRENT_DAY} component={CurrentDay} />
               <Route path={DASHBOARD} component={Dashboard} />
               <Route path={EDIT} component={EditPage} />
               <Redirect to={CURRENT_DAY} />
             </Switch>
+            <BottomMenu />
           </div>
         </Router>
       ) : (
