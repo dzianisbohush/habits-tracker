@@ -13,8 +13,8 @@ export const CurrentDay = () => {
   const [initialErlyHabits, setInitialEarlyHabits] = useState([])
 
   const todayHabitsRef = firebase
-      .database()
-      .ref(`${uid}/habbits/${moment().format(KEY_DATE_FORMAT)}`)
+    .database()
+    .ref(`${uid}/habbits/${moment().format(KEY_DATE_FORMAT)}`)
 
   useEffect(() => {
     const allHabitsRef = firebase.database().ref(`${uid}/habbits`)
@@ -79,16 +79,25 @@ export const CurrentDay = () => {
     return (100 / allTotalStepsCount) * allCompletedStepsCount
   }, [habits])
 
+  const changeHabitStep = (id, value) => {
+    todayHabitsRef.child(id).update({
+      completedSteps: value,
+    })
+  }
+
   // @todo change to id instead of title
-  const declineStep = (title) => () => {
+  const declineStep = (id, title) => () => {
+    let value
     setHabits(
       habits.map((habit) => {
         if (habit.title === title) {
-          return { ...habit, completedSteps: --habit.completedSteps }
+          value = --habit.completedSteps
+          return { ...habit, completedSteps: value }
         }
 
         return habit
       }),
+      changeHabitStep(id, value),
     )
 
     //@todo try union the func with increaseStep
@@ -102,15 +111,18 @@ export const CurrentDay = () => {
   }
 
   // @todo change to id instead of title
-  const increaseStep = (title) => () => {
+  const increaseStep = (id, title) => () => {
+    let value
     setHabits(
       habits.map((habit) => {
         if (habit.title === title) {
-          return { ...habit, completedSteps: ++habit.completedSteps }
+          value = ++habit.completedSteps
+          return { ...habit, completedSteps: value }
         }
 
         return habit
       }),
+      changeHabitStep(id, value),
     )
 
     //@todo add changes to db
@@ -136,7 +148,7 @@ export const CurrentDay = () => {
 
       {/* //@todo habits list to separate component */}
       <div>
-        {habits.map(({ title, completedSteps, totalSteps }) => (
+        {habits.map(({ id, title, completedSteps, totalSteps }) => (
           <div
             key={title}
             style={{
@@ -153,12 +165,12 @@ export const CurrentDay = () => {
             />
             <Button.Group>
               <Button
-                onClick={declineStep(title)}
+                onClick={declineStep(id, title)}
                 icon={<MinusOutlined />}
                 disabled={completedSteps === 0}
               />
               <Button
-                onClick={increaseStep(title)}
+                onClick={increaseStep(id, title)}
                 icon={<PlusOutlined />}
                 disabled={completedSteps === totalSteps}
               />
