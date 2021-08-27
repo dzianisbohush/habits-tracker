@@ -1,0 +1,9 @@
+body {
+  background: #444444;
+  color: #b4b4b4;
+}
+
+.app {
+  height: 10em;
+  position: relative;
+}

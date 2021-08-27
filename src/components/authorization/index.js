@@ -1,6 +1,7 @@
 import React from 'react';
-import { fireAuth, fireGoogleProvider } from '../firebase';
-import { CURRENT_DAY } from '../constants/routes';
+import styles from './style.module.css';
+import { fireAuth, fireGoogleProvider } from '../../firebase';
+import { CURRENT_DAY } from '../../constants/routes';
 
 export const Authorithation = ({ history }) => {
   const signIn = (event) => {
@@ -15,8 +16,8 @@ export const Authorithation = ({ history }) => {
       });
   };
   return (
-    <div className="buttonWrapper">
-      <button className="button" onClick={signIn}>
+    <div className={styles.buttonWrapper}>
+      <button className={styles.button} onClick={signIn}>
         Sign In With Google
       </button>
     </div>

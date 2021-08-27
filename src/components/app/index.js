@@ -1,29 +1,26 @@
-import React, { useState, createContext } from 'react';
+import React from 'react';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Redirect,
 } from 'react-router-dom';
-import './App.css';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { UserContext } from './utils/context';
-import { CurrentDay } from './components/currentDay';
-import { Dashboard } from './components/dashboard';
+import { UserContext } from '../../utils/context';
+import { CurrentDay } from '../currentDay';
+import { Dashboard } from '../dashboard';
 import {
   START,
   DASHBOARD,
   EDIT,
-  CURRENT_DAY
-} from './constants/routes';
-import { Authorithation } from './components/Authorithation';
-import { fireAuth } from './firebase';
-import { EditPage } from './components/edit';
-import { BottomMenu } from './components/Menu';
+  CURRENT_DAY,
+} from '../../constants/routes';
+import { Authorithation } from '../authorization';
+import { fireAuth } from '../../firebase';
+import { EditPage } from '../edit';
+import { BottomMenu } from '../menu';
 
-export const MyContext = createContext({});
-
-function App() {
+export const App = () => {
   const [user, isLoading] = useAuthState(fireAuth);
 
   if (isLoading) {
@@ -61,5 +58,5 @@ function App() {
       )}
     </UserContext.Provider>
   );
-}
+};
 export default App;
