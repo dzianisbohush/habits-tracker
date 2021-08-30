@@ -55,6 +55,7 @@ export const CurrentDay = () => {
 
   useEffect(() => {
     if (shouldSendHabitsToDB) {
+      setShouldSendHabitsToDB(false);
       habits.forEach((habit) => {
         const habitKeys = Object.keys(habit).filter(
           (key) => key !== 'id',
@@ -69,8 +70,6 @@ export const CurrentDay = () => {
         });
         todayHabitsRef.push(habitToSend);
       });
-
-      setShouldSendHabitsToDB(false);
     }
   }, [shouldSendHabitsToDB]);
 
