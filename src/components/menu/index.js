@@ -37,10 +37,26 @@ export const BottomMenu = () => {
       selectedKeys={[currentMenuItem]}
       mode="horizontal"
     >
-      <Menu.Item key={CURRENT_DAY} icon={<CalendarOutlined />} />
-      <Menu.Item key={DASHBOARD} icon={<BarChartOutlined />} />
-      <Menu.Item key={EDIT} icon={<EditOutlined />} />
-      <Menu.Item key={logoutKey} icon={<LogoutOutlined />} />
+      <Menu.Item
+        className={styles.menuItem}
+        key={CURRENT_DAY}
+        icon={<CalendarOutlined />}
+      />
+      <Menu.Item
+        className={styles.menuItem}
+        key={DASHBOARD}
+        icon={<BarChartOutlined />}
+      />
+      <Menu.Item
+        className={styles.menuItem}
+        key={EDIT}
+        icon={<EditOutlined />}
+      />
+      <Menu.Item
+        className={styles.menuItem}
+        key={logoutKey}
+        icon={<LogoutOutlined />}
+      />
     </Menu>
   );
 };
