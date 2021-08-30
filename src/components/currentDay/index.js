@@ -1,16 +1,10 @@
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useContext,
-} from 'react';
-import { Progress, Button } from 'antd';
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
-import moment from 'moment';
-import styles from './style.module.css';
-import firebase from '../../firebase';
+import React, { useState, useEffect, useContext } from 'react';
+import { fireDB } from '../../firebase';
 import { UserContext } from '../../utils/context';
-import { KEY_DATE_FORMAT } from '../../constants/date';
+import { TODAY } from '../../constants/date';
+import { COMPLETED_STEPS, HABITS } from '../../constants/refsDB';
+import { ProgressHeader } from './progressHeader';
+import { HabitsList } from './habitList';
 
 export const CurrentDay = () => {
   const { uid } = useContext(UserContext);
@@ -18,14 +12,10 @@ export const CurrentDay = () => {
   const [shouldSendHabitsToDB, setShouldSendHabitsToDB] =
     useState(false);
 
-  // @todo add todayHabitsRef to constants (we will use this for edit page at least)
-  const todayHabitsRef = firebase
-    .database()
-    .ref(`${uid}/habbits/${moment().format(KEY_DATE_FORMAT)}`);
+  const todayHabitsRef = fireDB.ref(`${uid}/${HABITS}/${TODAY}`);
 
   useEffect(() => {
-    // @todo add allHabitsRef to constants (we will use this for dashboard page at least)
-    const allHabitsRef = firebase.database().ref(`${uid}/habbits`);
+    const allHabitsRef = fireDB.ref(`${uid}/${HABITS}`);
 
     todayHabitsRef.on('value', (snapshot) => {
       const todayHabits = snapshot.val();
@@ -44,9 +34,9 @@ export const CurrentDay = () => {
             const dates = Object.keys(allHabits);
             const lastDate = dates[dates.length - 1];
 
-            const lastDayHabitsRef = firebase
-              .database()
-              .ref(`${uid}/habbits/${lastDate}`);
+            const lastDayHabitsRef = fireDB.ref(
+              `${uid}/${HABITS}/${lastDate}`,
+            );
 
             lastDayHabitsRef.on('value', (snapshot) => {
               const yesterdayHabits = snapshot.val();
@@ -71,7 +61,7 @@ export const CurrentDay = () => {
         );
         const habitToSend = {};
         habitKeys.forEach((key) => {
-          if (key === 'completedSteps') {
+          if (key === COMPLETED_STEPS) {
             habitToSend[key] = 0;
           } else {
             habitToSend[key] = habit[key];
@@ -84,103 +74,10 @@ export const CurrentDay = () => {
     }
   }, [shouldSendHabitsToDB]);
 
-  const currentDayProgress = useMemo(() => {
-    let allTotalStepsCount = 0;
-    let allCompletedStepsCount = 0;
-
-    habits.forEach(({ totalSteps, completedSteps }) => {
-      allTotalStepsCount += totalSteps;
-      allCompletedStepsCount += completedSteps;
-    });
-
-    return (100 / allTotalStepsCount) * allCompletedStepsCount;
-  }, [habits]);
-
-  const changeHabitStep = (id, value) => {
-    todayHabitsRef.child(id).update({
-      completedSteps: value,
-    });
-  };
-
-  // @todo try union the func with increaseStep
-  // @todo change to id instead of title
-  const declineStep = (id, title) => () => {
-    let value;
-    setHabits(
-      habits.map((habit) => {
-        if (habit.title === title) {
-          value = --habit.completedSteps;
-          return { ...habit, completedSteps: value };
-        }
-
-        return habit;
-      }),
-      changeHabitStep(id, value),
-    );
-  };
-
-  // @todo change to id instead of title
-  const increaseStep = (id, title) => () => {
-    let value;
-    setHabits(
-      habits.map((habit) => {
-        if (habit.title === title) {
-          value = ++habit.completedSteps;
-          return { ...habit, completedSteps: value };
-        }
-
-        return habit;
-      }),
-      changeHabitStep(id, value),
-    );
-  };
-
   return (
     <div>
-      {/* @todo move header to separate component */}
-      <div>
-        <p className={styles.date}>{moment().format('LL')}</p>
-        <Progress
-          className={styles.progressCircle}
-          type="circle"
-          percent={currentDayProgress}
-          format={(percents) => `${Math.trunc(percents)} %`}
-        />
-      </div>
-
-      {/* //@todo habits list to separate component */}
-      <div>
-        {habits.map(({ id, title, completedSteps, totalSteps }) => (
-          <div key={id} className={styles.habitWrapper}>
-            <div className={styles.habitProgressCircleWrapper}>
-              <Progress
-                className={styles.habitProgressCircle}
-                percent={(100 / totalSteps) * completedSteps}
-                showInfo={false}
-                size="small"
-                type="circle"
-                strokeWidth={15}
-                width={20}
-              />
-              <p className={styles.habitName}>{title}</p>
-            </div>
-            <Button.Group className={styles.buttonGroup}>
-              <Button
-                className={styles.button}
-                onClick={declineStep(id, title)}
-                icon={<MinusOutlined />}
-                disabled={completedSteps === 0}
-              />
-              <Button
-                className={styles.button}
-                onClick={increaseStep(id, title)}
-                icon={<PlusOutlined />}
-                disabled={completedSteps === totalSteps}
-              />
-            </Button.Group>
-          </div>
-        ))}
-      </div>
+      <ProgressHeader habits={habits} />
+      <HabitsList habits={habits} setHabits={setHabits} />
     </div>
   );
 };
