@@ -1,6 +1,8 @@
 body {
   background: #444444;
   color: #b4b4b4;
+  height: auto;
+  width: auto;
 }
 
 .app {
