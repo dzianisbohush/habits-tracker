@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { Form, Input, Button, InputNumber } from 'antd';
+import styles from './style.module.css';
 import { fireDB } from '../../../firebase';
 import { HABITS } from '../../../constants/refsDB';
 import { TODAY } from '../../../constants/date';
@@ -7,10 +8,12 @@ import { UserContext } from '../../../utils/context';
 
 export const HabitAddingForm = () => {
   const { uid } = useContext(UserContext);
+  const [form] = Form.useForm();
   const todayHabitsRef = fireDB.ref(`${uid}/${HABITS}/${TODAY}`);
 
   const onFinish = (values) => {
     todayHabitsRef.push({ ...values, completedSteps: 0 });
+    form.resetFields();
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -20,23 +23,28 @@ export const HabitAddingForm = () => {
   return (
     <div>
       <Form
-        labelCol={{ span: 3 }}
-        wrapperCol={{ span: 3 }}
+        className={styles.form}
+        form={form}
+        wrapperCol={{ span: 16 }}
         initialValues={{ remember: true }}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
         <Form.Item
+          className={styles.formItem}
           label="Title"
           name="title"
           rules={[{ required: true, message: 'Title of habit' }]}
         >
-          <Input />
+          <Input className={styles.input} />
         </Form.Item>
 
         <Form.Item
+          className={styles.formItem}
+          wrapperCol={{ span: 6 }}
           label="Total steps"
           name="totalSteps"
+          initialValue={1}
           rules={[
             {
               required: true,
@@ -44,7 +52,7 @@ export const HabitAddingForm = () => {
             },
           ]}
         >
-          <InputNumber min={1} max={10} />
+          <InputNumber className={styles.input} min={1} max={10} />
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 3, span: 3 }}>
