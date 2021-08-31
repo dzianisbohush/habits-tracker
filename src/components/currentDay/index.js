@@ -7,8 +7,9 @@ import { ProgressHeader } from './progressHeader';
 import { HabitsList } from './habitList';
 
 export const CurrentDay = () => {
+  const initialHabitsValue = []
   const { uid } = useContext(UserContext);
-  const [habits, setHabits] = useState([]);
+  const [habits, setHabits] = useState(initialHabitsValue);
   const [shouldSendHabitsToDB, setShouldSendHabitsToDB] =
     useState(false);
 
@@ -21,7 +22,7 @@ export const CurrentDay = () => {
       const todayHabits = snapshot.val();
       const habitsList = [];
 
-      if (todayHabits) {
+      if (todayHabits && habits === initialHabitsValue) {
         for (const id in todayHabits) {
           habitsList.push({ id, ...todayHabits[id] });
         }
