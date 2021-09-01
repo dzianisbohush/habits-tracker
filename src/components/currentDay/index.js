@@ -7,7 +7,7 @@ import { ProgressHeader } from './progressHeader';
 import { HabitsList } from './habitList';
 
 export const CurrentDay = () => {
-  const initialHabitsValue = []
+  const initialHabitsValue = [];
   const { uid } = useContext(UserContext);
   const [habits, setHabits] = useState(initialHabitsValue);
   const [shouldSendHabitsToDB, setShouldSendHabitsToDB] =

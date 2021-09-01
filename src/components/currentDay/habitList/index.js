@@ -7,16 +7,17 @@ import { MINUS, PLUS } from '../../../constants/values';
 import { COMPLETED_STEPS, HABITS } from '../../../constants/refsDB';
 import { TODAY } from '../../../constants/date';
 import { UserContext } from '../../../utils/context';
+import { showNotification } from '../../../utils/showNotification';
 
 export const HabitsList = ({ habits, setHabits }) => {
   const { uid } = useContext(UserContext);
-
   const todayHabitsRef = fireDB.ref(`${uid}/${HABITS}/${TODAY}`);
 
   const changeHabitStepDB = (id, value) => {
     todayHabitsRef.child(id).update({
       [COMPLETED_STEPS]: value,
     });
+    showNotification('Changes have been send to DB', 'success');
   };
 
   const changeHabitStep = (id) => (event) => {

@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { Spin } from 'antd';
+import { ToastContainer } from 'react-toastify';
 import styles from './style.module.css';
 import { UserContext } from '../../utils/context';
 import { CurrentDay } from '../currentDay';
@@ -45,6 +46,7 @@ export const App = () => {
               <Redirect to={CURRENT_DAY} />
             </Switch>
             <BottomMenu />
+            <ToastContainer />
           </div>
         </Router>
       ) : (

@@ -5,6 +5,7 @@ import { fireDB } from '../../../firebase';
 import { HABITS } from '../../../constants/refsDB';
 import { TODAY } from '../../../constants/date';
 import { UserContext } from '../../../utils/context';
+import { showNotification } from '../../../utils/showNotification';
 
 export const HabitAddingForm = () => {
   const { uid } = useContext(UserContext);
@@ -12,12 +13,17 @@ export const HabitAddingForm = () => {
   const todayHabitsRef = fireDB.ref(`${uid}/${HABITS}/${TODAY}`);
 
   const onFinish = (values) => {
+    showNotification('Habit was add to DB', 'success');
     todayHabitsRef.push({ ...values, completedSteps: 0 });
     form.resetFields();
   };
 
   const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+    showNotification(
+      'Something went wrong. More information in console',
+      'error',
+    );
+    console.log(errorInfo);
   };
 
   return (
