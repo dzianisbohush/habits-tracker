@@ -9,9 +9,11 @@ import { TODAY } from '../../../constants/date';
 import { UserContext } from '../../../utils/context';
 import { showNotification } from '../../../utils/showNotification';
 
-export const HabitsList = ({ habits, setHabits }) => {
+export const HabitsList = ({ habits, setHabits, currentDate }) => {
   const { uid } = useContext(UserContext);
-  const todayHabitsRef = fireDB.ref(`${uid}/${HABITS}/${TODAY}`);
+  const todayHabitsRef = fireDB.ref(
+    `${uid}/${HABITS}/${currentDate}`,
+  );
 
   const changeHabitStepDB = (id, value) => {
     todayHabitsRef.child(id).update({

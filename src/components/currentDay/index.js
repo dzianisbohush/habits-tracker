@@ -9,22 +9,32 @@ import { HabitsList } from './habitList';
 export const CurrentDay = () => {
   const initialHabitsValue = [];
   const { uid } = useContext(UserContext);
+  const [allDates, setAllDates] = useState([]);
+  const [currentDate, setCurrentDate] = useState(TODAY);
   const [habits, setHabits] = useState(initialHabitsValue);
   const [shouldSendHabitsToDB, setShouldSendHabitsToDB] =
     useState(false);
 
-  const todayHabitsRef = fireDB.ref(`${uid}/${HABITS}/${TODAY}`);
+  const allHabitsRef = fireDB.ref(`${uid}/${HABITS}`);
+  const currentHabitsRef = fireDB.ref(
+    `${uid}/${HABITS}/${currentDate}`,
+  );
 
   useEffect(() => {
-    const allHabitsRef = fireDB.ref(`${uid}/${HABITS}`);
-
-    todayHabitsRef.on('value', (snapshot) => {
-      const todayHabits = snapshot.val();
+    allHabitsRef.on('value', (snapshot) => {
+      const habits = snapshot.val();
+      if (habits) setAllDates(Object.keys(habits));
+    });
+  }, []);
+  // TODO investigate about getting habits from prev day
+  useEffect(() => {
+    currentHabitsRef.on('value', (snapshot) => {
+      const currentHabits = snapshot.val();
       const habitsList = [];
 
-      if (todayHabits && habits === initialHabitsValue) {
-        for (const id in todayHabits) {
-          habitsList.push({ id, ...todayHabits[id] });
+      if (currentHabits) {
+        for (const id in currentHabits) {
+          habitsList.push({ id, ...currentHabits[id] });
         }
         setHabits(habitsList);
       } else {
@@ -52,7 +62,7 @@ export const CurrentDay = () => {
         });
       }
     });
-  }, []);
+  }, [currentDate]);
 
   useEffect(() => {
     if (shouldSendHabitsToDB) {
@@ -69,15 +79,24 @@ export const CurrentDay = () => {
             habitToSend[key] = habit[key];
           }
         });
-        todayHabitsRef.push(habitToSend);
+        currentHabitsRef.push(habitToSend);
       });
     }
   }, [shouldSendHabitsToDB]);
 
   return (
     <div>
-      <ProgressHeader habits={habits} />
-      <HabitsList habits={habits} setHabits={setHabits} />
+      <ProgressHeader
+        habits={habits}
+        currentDate={currentDate}
+        allDates={allDates}
+        setCurrentDate={setCurrentDate}
+      />
+      <HabitsList
+        habits={habits}
+        setHabits={setHabits}
+        currentDate={currentDate}
+      />
     </div>
   );
 };

@@ -1,12 +1,21 @@
+.mainWrapper {
+  margin-bottom: 2em;
+}
+
 .date {
   text-align: center;
   font-size: 20px;
   margin-top: 0.5em;
 }
 
+.progressWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .progressCircle {
-  width: 100%;
   display: flex;
   justify-content: center;
-  margin-bottom: 2em;
+  margin: 0 2em;
 }
