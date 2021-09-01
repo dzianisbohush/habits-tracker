@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import { Menu } from 'antd';
 import {
   CalendarOutlined,
@@ -13,8 +13,25 @@ import { CURRENT_DAY, DASHBOARD, EDIT } from '../../constants/routes';
 
 export const BottomMenu = () => {
   const history = useHistory();
-  const [currentMenuItem, setCurrentMenuItem] = useState(CURRENT_DAY);
+  const { pathname } = useLocation();
+  const [currentMenuItem, setCurrentMenuItem] = useState('');
   const logoutKey = 'logoutButton';
+
+  useEffect(() => {
+    switch (pathname) {
+      case '/edit':
+        setCurrentMenuItem(EDIT);
+        break;
+      case '/dashboard':
+        setCurrentMenuItem(DASHBOARD);
+        break;
+      case '/current-day':
+        setCurrentMenuItem(CURRENT_DAY);
+        break;
+      default:
+        break;
+    }
+  }, []);
 
   const handleMenuClick = (e) => {
     setCurrentMenuItem(e.key);
